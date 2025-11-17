@@ -58,17 +58,40 @@ function calcularTotalFatura(pecas, apresentacoes){
 }
 
 function gerarFaturaStr (fatura, pecas) {
-
-    let faturaStr = `Fatura ${fatura.cliente}\n`;
-    for (let apre of fatura.apresentacoes) {
-      faturaStr += `  ${getPeca(pecas, apre).nome}: ${formatarMoeda(calcularTotalApresentacao(pecas, apre))} (${apre.audiencia} assentos)\n`;
-    }
-    faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura(pecas, fatura.apresentacoes))}\n`;
-    faturaStr += `Créditos acumulados: ${calcularTotalCreditos(pecas, fatura.apresentacoes)} \n`;
-    return faturaStr;
+  let faturaStr = `Fatura ${fatura.cliente}\n`;
+  for (let apre of fatura.apresentacoes) {
+    faturaStr += `  ${getPeca(pecas, apre).nome}: ${formatarMoeda(calcularTotalApresentacao(pecas, apre))} (${apre.audiencia} assentos)\n`;
   }
+  faturaStr += `Valor total: ${formatarMoeda(calcularTotalFatura(pecas, fatura.apresentacoes))}\n`;
+  faturaStr += `Créditos acumulados: ${calcularTotalCreditos(pecas, fatura.apresentacoes)} \n`;
+  return faturaStr;
+}
+
+function gerarFaturaHTML(fatura, pecas) {
+  let html = "<html>\n";
+
+  html += `<p> Fatura ${fatura.cliente} </p>\n`;
+  html += "<ul>\n";
+
+  for (const apre of fatura.apresentacoes) {
+    const nome = getPeca(pecas, apre).nome;
+    const valor = formatarMoeda(calcularTotalApresentacao(pecas, apre));
+    html += `<li>  ${nome}: ${valor} (${apre.audiencia} assentos) </li>\n`;
+  }
+  const total = formatarMoeda(calcularTotalFatura(pecas, fatura.apresentacoes));
+  const creditos = calcularTotalCreditos(pecas, fatura.apresentacoes);
+
+  html += "</ul>\n";
+  html += `<p> Valor total: ${total} </p>\n`;
+  html += `<p> Créditos acumulados: ${creditos} </p>\n`;
+  html += "</html>";
+
+  return html;
+}
 
 const faturas = JSON.parse(readFileSync('./faturas.json'));
 const pecas = JSON.parse(readFileSync('./pecas.json'));
 const faturaStr = gerarFaturaStr(faturas, pecas);
+const faturaHTML = gerarFaturaHTML(faturas, pecas);
 console.log(faturaStr);
+console.log(faturaHTML);
